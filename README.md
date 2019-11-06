@@ -5,8 +5,7 @@ Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_j
 ### Prereq:
 
 - Python 2.7
-- R (https://cran.r-project.org/bin/macosx/)
-- R packages - “ape” and “RColorBrewer”
+- R, Packages - “ape” and “RColorBrewer”
 - `install.packages(c('ape','RColorBrewer'))`
 
 ### How to Run?
