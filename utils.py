@@ -3,7 +3,7 @@ from neighbor_joining import nei_saitou
 
 # Calculate the difference between two input id_sequences
 # simply counts mismatches and return the percentage as a float
-def calculate_difference(s1,s2):
+def get_difference(s1,s2):
     totalCount = len(s1)
     mismatchCount = 0
     for i in xrange(totalCount):
@@ -21,56 +21,91 @@ def get_difference_matrix(ids, id_sequences):
     matrix = [[0] * count for _ in xrange(count)]
     for i, id1 in enumerate(ids):
         for j, id2 in enumerate(ids):
-            matrix[i][j] = calculate_difference(id_sequences[id1], id_sequences[id2])
+            matrix[i][j] = get_difference(id_sequences[id1], id_sequences[id2])
     return matrix
 
 
-# get the leaves under this node using dfs
-# returns a set of node.ids
-def get_leaves(node):
-    leaves = set()
-    def dfs(node):
-        global count
-        if not node or not node.children:
-            leaves.add(node.id)
+### I/O
+
+# function to read the fna file. Returns the ids and the dictionary
+# of relationships of id -> sequence for fast lookups
+def read_fasta_file(filename):
+    dictionary = {}
+    ids = []
+    with open(filename) as f:
+        content = f.read().splitlines()
+    currId = None
+    for index, line in enumerate(content):
+        if index % 2 == 0:
+            currId = line[1:]
+            ids.append(currId)
         else:
-            for child in node.children.keys():
-                dfs(child)
-    dfs(node)
-    return leaves
+            dictionary[currId] = line
+    return ids, dictionary
+    
+
+# writes the difference matrix to file
+def write_distance_file(ids, matrix):
+    count = len(ids)
+    with open('genetic_distances.txt', 'w') as f:
+        f.write('\t' + '\t'.join(ids) + '\n')
+        for i in xrange(count):
+            f.write(ids[i] + '\t' + '\t'.join(map(str, matrix[i])) + '\n')
 
 
-# return the dictionary of id -> set of leaves under that node
-# using bfs with a queue
-def get_partitions(root):
-    queue = [root]
-    partition = {}
-    while len(queue):
-        tmp = []
-        for node in queue:
-            # this is a leaf
-            if not node.children:
-                continue
-            leaves = get_leaves(node)
-            partition[node.id] = leaves
-            for child in node.children.keys():
-                tmp.append(child)
-        queue = tmp
-    return partition
-
-
-# get the dfs order of the tree
-def get_id_order(root):
-    order = []
-    def dfs(node):
+# uses preorder traversal to traverse the tree and generate the edges file
+def write_edge_file(root):
+    traversal = []
+    
+    # recursive preorder traversal
+    def preorder_traversal(node):
         if not node or not node.children:
             return
-        else:
-            order.append(node.id)
-            for child in node.children.keys():
-                dfs(child)
-    dfs(root)
-    return order
+        for child, distance in node.children.items():
+            # traverse root first
+            traversal.append((node.id, child.id, distance))
+            # then traverse children recursively
+            preorder_traversal(child)
+    
+    preorder_traversal(root)
+
+    # writes the traversal list to file
+    with open('edges.txt', 'w') as f:
+        for (parent, child, distance) in traversal:
+            f.write(parent + '\t' + child + '\t' + str(distance) + '\n')
+
+
+# uses post order traversal to write the newick file
+def write_newick_file(original_ids, root):
+    # recursive postorder traversal
+    def postorder_traversal(node):
+        if not node.children:
+            # if it a leaf node then return the original id
+            if 1 <= int(node.id) <= 61:
+                return original_ids[int(node.id) - 1]
+        vals = []
+        # recursively traverse the children first
+        for child, distance in node.children.items():
+            vals.append(postorder_traversal(child) + ':' + str(distance))
+        result = '(' + ','.join(vals) + ')'
+        return result
+    # get the root nodes children.
+    # split it up into a 2 pair and 1 extra node for the root
+    (first, fd), (second, sd), (third, td) = root.children.items()
+    # recursively call the postorder traversal function to generate the newick format
+    first_part = '(' + postorder_traversal(second) + ':' + str(sd) + ','+ postorder_traversal(third) + ':' + str(td) + ')'
+    newick =  '(' + first_part + ':' + str(fd) + ');'
+    with open('tree.txt', 'w') as f:
+        f.write(newick)
+
+
+### BOOTSTRAPPING
+
+# write the percentages in the bootstrap file
+def write_bootstrap(percentages):
+    with open('bootstrap.txt', 'w') as f:
+        for percent in percentages:
+            f.write(str(percent) + '\n')
 
 # do the 100 bootstrap sampling
 def bootstrap(original_root, ids, id_sequences):

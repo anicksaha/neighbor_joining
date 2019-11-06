@@ -1,8 +1,7 @@
 from tree import TreeNode
 
-# implemetnation of the nei saitou algorithm.
-# Takes in the original ids and the distance matrix
-# need original id ordering
+# Implemetnation of the nei saitou algorithm.
+# Takes in the original ids and the distance matrix (need original id ordering)
 def nei_saitou(original_ids, original_distance_matrix):
     # global root value and nodeId
     global nodeId, root
