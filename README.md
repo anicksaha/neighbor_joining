@@ -2,6 +2,13 @@
 
 Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_joining) for phylogeny construction.
 
+### Prereq:
+
+- Python 2.7
+- R, packages in R: {“ape”, “RColorBrewer”}
+
+`install.packages(c('ape','RColorBrewer'))`
+
 ### How to Run?
 
 - `python main.py <path to sequence file>`
