@@ -12,10 +12,6 @@
 *.Rapp.history
 
 # Files
-tree.txt
-edges.txt
-bootstrap.txt
 
 # Plots
-tree.pdf
 
