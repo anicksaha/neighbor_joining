@@ -10,3 +10,11 @@
 
 # R
 *.Rapp.history
+
+# Files
+tree.txt
+edges.txt
+
+# Plots
+tree.pdf
+
