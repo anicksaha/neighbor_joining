@@ -1,5 +1,7 @@
 ### Neighbor joining
 
-> Nei-Saitou neighbor-joining algorithm for phylogeny construction
+Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_joining) for phylogeny construction.
 
-- [Wikipedia](https://en.wikipedia.org/wiki/Neighbor_joining) 
+### How to Run?
+
+`python main.py hw3.fna`
