@@ -26,7 +26,7 @@ def bootstrap(root, ids, sequences):
             bootstrap_sequences[id] = bootstrap_seq
 
         # Neisaitou and Distance Matrix for the new sequences
-        distMatrix = utils.get_distMatrix(ids, bootstrap_sequences)
+        distMatrix = utils.get_distance_matrix(ids, bootstrap_sequences)
         seqCounter = 120
         root = neighbour_joining.nei_saitou(ids, distMatrix, seqCounter)
         # get the dictionary of partitions and ids under those partitions

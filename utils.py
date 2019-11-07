@@ -26,7 +26,7 @@ def get_distance(seq1,seq2):
 
 
 # Fucntion to get the overall distance matrix for all the sequences.
-def get_distMatrix(ids, sequences):
+def get_distance_matrix(ids, sequences):
     total = len(ids)
     matrix = [[0] * total for _ in range(total)]
     for i, id1 in enumerate(ids):
@@ -36,7 +36,7 @@ def get_distMatrix(ids, sequences):
 
 
 # writes the distance matrix to a file
-def write_distMatrix(ids, matrix):
+def write_distance_matrix(ids, matrix):
     num_ids = len(ids)
     with open('genetic_distances.txt', 'w') as f:
     	# First append the row of ids.
