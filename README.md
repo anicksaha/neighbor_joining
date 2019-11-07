@@ -19,7 +19,7 @@ This generates the following files:
 3. tree.txt
 4. bootstrap.txt
 
-All the above files are in the folder answers.
+All the above files are in the folder `submission`.
 
 ### Visualize
 
