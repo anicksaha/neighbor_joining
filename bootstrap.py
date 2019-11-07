@@ -1,8 +1,7 @@
 from node import Node
-import sys
 import neighbour_joining
 import utils
-from random import randint
+import random
 
 # do the 100 bootstrap sampling
 def bootstrap(root, ids, sequences):
@@ -18,7 +17,7 @@ def bootstrap(root, ids, sequences):
         # Using a random seq to get the length of the sequences. Assuming all the sequences to be of the same length.
         indices_to_generate = len(sequences['152801'])
         for i in range(indices_to_generate):
-            indices.append(randint(0, indices_to_generate-1))
+            indices.append(random.randint(0, indices_to_generate-1))
 
         for id in ids:
             bootstrap_seq = ''
