@@ -11,7 +11,7 @@ Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_j
 ### How to Run?
 
 To run the code:
-- `python main.py data/hw3.fna`
+- `python main.py hw3.fna`
 
 This generates the following files:
 1. genetic_distances.txt
@@ -25,9 +25,9 @@ All the above files are in the folder answers.
 
 For visualization:
 
-- `Rscript scripts-data/hw3-plot-newick.r tree.txt scripts-data/hw3-tip-labels.txt`
-- `Rscript scripts-data/hw3-plot-edges.r edges.txt scripts-data/hw3-tip-labels.txt`
+- `Rscript scripts/hw3-plot-newick.r tree.txt hw3-tip-labels.txt`
+- `Rscript scripts/hw3-plot-edges.r edges.txt hw3-tip-labels.txt`
 
 For bonus visualization:
 
-- `Rscript scripts-data/hw3-plot-edges.r edges.txt scripts-data/hw3-tip-labels.txt boot.txt`
+- `Rscript scripts/hw3-plot-edges.r edges.txt hw3-tip-labels.txt boot.txt`
