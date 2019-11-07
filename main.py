@@ -10,16 +10,15 @@ def main(filename):
     ids, sequences = utils.read_fasta_file(filename)
 
     # Then generate the distance matrix
-    distMatrix = utils.get_distMatrix(ids, sequences)
+    distance_matrix = utils.get_distMatrix(ids, sequences)
 
     # write the distances.txt file (distance matrix)
-    utils.write_distMatrix(ids, distMatrix)
+    utils.write_distMatrix(ids, distance_matrix)
     
-    #This is used to number the sequences/nodes in the tree to be constructed
-    seqCounter = 120
-
-    Neighbour_Joining_instance = neighbour_joining.Neighbour_Joining()
-    root = Neighbour_Joining_instance.nei_saitou(ids, distMatrix, seqCounter)
+    # This is used to number the sequences/nodes in the tree to be constructed
+    sequence_counter = 120
+    # Run the nei saitu algorithm. Returns the root of the tree
+    root = neighbour_joining.nei_saitou(ids, distance_matrix, sequence_counter)
 
     # Writing the edge file
     utils.write_edge_file(root)
