@@ -30,4 +30,4 @@ For visualization:
 
 For bonus visualization:
 
-- `Rscript scripts/hw3-plot-edges.r edges.txt hw3-tip-labels.txt boot.txt`
+- `Rscript scripts/hw3-plot-edges.r edges.txt hw3-tip-labels.txt bootstrap.txt`
