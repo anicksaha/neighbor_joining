@@ -1,9 +1,8 @@
 from node import Node
-import sys
 import neighbour_joining
 import utils
-from random import randint
 import bootstrap
+import sys
 
 def main(filename):
     # First step is to read the file and get the sequences
@@ -26,12 +25,9 @@ def main(filename):
     # Writing the newick file
     utils.write_newick_file(ids, root)
 
-    #bootstrap calculations
-    #Bootstrap_instance = bootstrap.Bootstrap()
-    #percentages = Bootstrap_instance.bootstrap(root, ids, sequences)
-    #utils.write_bootstrap(percentages)
-
+    # bootstrap calculations
+    percentages = bootstrap.bootstrap(root, ids, sequences)
+    bootstrap.write_bootstrap(percentages)
 
 if __name__ == '__main__':
     main(sys.argv[1])
-    

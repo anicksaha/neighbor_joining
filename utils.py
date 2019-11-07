@@ -64,12 +64,6 @@ def write_newick_file(seqIds, root):
     with open('tree.txt', 'w') as f:
         f.write(newick)
 
-# write the percentages in the bootstrap file
-def write_bootstrap(percentages):
-    with open('boot.txt', 'w') as f:
-        for percent in percentages:
-            f.write(str(percent) + '\n')
-
 def preOrder(root, visited):
     if visited is None:
         visited = []
@@ -88,4 +82,3 @@ def write_edge_file(root):
     with open('edges.txt', 'w') as f:
         for (parent, child, distance) in visited:
             f.write(parent + '\t' + child + '\t' + str(distance) + '\n')
-
