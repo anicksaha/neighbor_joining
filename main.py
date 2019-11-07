@@ -1,6 +1,6 @@
 from node import Node
 import sys
-from neighbour_joining import nei_saitou
+import neighbour_joining
 import utils
 from random import randint
 import bootstrap
@@ -18,7 +18,8 @@ def main(filename):
     #This is used to number the sequences/nodes in the tree to be constructed
     seqCounter = 120
 
-    root = nei_saitou(ids, distMatrix, seqCounter)
+    Neighbour_Joining_instance = neighbour_joining.Neighbour_Joining()
+    root = Neighbour_Joining_instance.nei_saitou(ids, distMatrix, seqCounter)
 
     # Writing the edge file
     utils.write_edge_file(root)
