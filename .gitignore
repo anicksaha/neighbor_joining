@@ -13,9 +13,9 @@ __pycache__
 *.Rapp.history
 
 # Files
-genetic_distances.txt
-edges.txt
-tree.txt
+# genetic_distances.txt
+# edges.txt
+# tree.txt
 
 # Plots
-tree.pdf
+# tree.pdf
