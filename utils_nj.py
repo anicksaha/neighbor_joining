@@ -26,14 +26,14 @@ def calculate_edge_lengths(dist_matrix, min_i, min_j, N):
     edge_j = dist_matrix[min_i][min_j] - edge_i
     return edge_i, edge_j
 
-def get_new_dist_matrix(dist_matrix, mini, minj, N):
+def get_new_dist_matrix(dist_matrix, min_i, min_j, N):
     updated_distances = [[0] * (N + 1) for _ in range(N + 1)]
     for i in xrange(N):
         for j in xrange(N):
             updated_distances[i][j] = dist_matrix[i][j]
     # update the distances to the new node
     for k in range(N):
-        updated_distances[N][k] = (0.5) * (dist_matrix[mini][k] + dist_matrix[minj][k] - dist_matrix[mini][minj])
+        updated_distances[N][k] = (0.5) * (dist_matrix[min_i][k] + dist_matrix[min_j][k] - dist_matrix[min_i][min_j])
         updated_distances[k][N] = updated_distances[N][k]
 
     # Create a new distance matrix 
@@ -41,12 +41,12 @@ def get_new_dist_matrix(dist_matrix, mini, minj, N):
     keep_i = keep_j = 0
     for i in range(N + 1):
         # Replacing these two with a new node
-        if i == mini or i == minj:
+        if i == min_i or i == min_j:
             continue
         keep_j = 0
         for j in range(N + 1):
             # Replacing these two with the new node
-            if j == mini or j == minj:
+            if j == min_i or j == min_j:
                 continue
             new_dist_matrix[keep_i][keep_j] = updated_distances[i][j]
             keep_j += 1
