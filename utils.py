@@ -1,139 +1,156 @@
-import random
-from neighbor_joining import nei_saitou
+# This file contains the util functions to be used
 
-# Calculate the difference between two input id_sequences
-# simply counts mismatches and return the percentage as a float
-def get_difference(s1,s2):
-    totalCount = len(s1)
-    mismatchCount = 0
-    for i in xrange(totalCount):
-        if s1[i] != s2[i]:
-            mismatchCount += 1
-    if mismatchCount == 0:
+# Function that reads the given fasta file and gets the sequences.
+def read_fasta_file(filename):
+    sequences = {}
+    ids = []
+    with open(filename) as f:
+        lines = f.read().splitlines()
+    curr = None
+    for index, line in enumerate(lines):
+        if index % 2 == 0:
+            curr = line[1:]
+            ids.append(curr)
+        else:
+            sequences[curr] = line
+    return ids, sequences
+
+# Function to calculate the distance between two sequences as a helper 
+def distance(seq1,seq2):
+    total = len(seq1)
+    mismatch = 0
+    for i in range(total):
+        if seq1[i] != seq2[i]:
+            mismatch += 1
+    if mismatch == 0:
         return 0
-    return mismatchCount / float(totalCount)
+    return mismatch / float(total)
 
-# function to calculate the difference matrix from ids and the id sequence mapping
-# uses the calculate_difference function
-# returns the matrix
-def get_difference_matrix(ids, id_sequences):
-    count = len(ids)
-    matrix = [[0] * count for _ in xrange(count)]
+
+# Fucntion to get the overall distance matrix for all the sequences.
+def get_distMatrix(ids, sequences):
+    total = len(ids)
+    matrix = [[0] * total for _ in range(total)]
     for i, id1 in enumerate(ids):
         for j, id2 in enumerate(ids):
-            matrix[i][j] = get_difference(id_sequences[id1], id_sequences[id2])
+            matrix[i][j] = distance(sequences[id1], sequences[id2])
     return matrix
 
 
-### I/O
-
-# function to read the fna file. Returns the ids and the dictionary
-# of relationships of id -> sequence for fast lookups
-def read_fasta_file(filename):
-    dictionary = {}
-    ids = []
-    with open(filename) as f:
-        content = f.read().splitlines()
-    currId = None
-    for index, line in enumerate(content):
-        if index % 2 == 0:
-            currId = line[1:]
-            ids.append(currId)
-        else:
-            dictionary[currId] = line
-    return ids, dictionary
-    
-
-# writes the difference matrix to file
-def write_distance_file(ids, matrix):
-    count = len(ids)
+# writes the distance matrix to a file
+def write_distMatrix(ids, matrix):
+    num_ids = len(ids)
     with open('genetic_distances.txt', 'w') as f:
+    	# First append the row of ids.
         f.write('\t' + '\t'.join(ids) + '\n')
-        for i in xrange(count):
+        for i in range(num_ids):
             f.write(ids[i] + '\t' + '\t'.join(map(str, matrix[i])) + '\n')
 
 
-# uses preorder traversal to traverse the tree and generate the edges file
-def write_edge_file(root):
-    traversal = []
-    
-    # recursive preorder traversal
-    def preorder_traversal(node):
-        if not node or not node.children:
-            return
-        for child, distance in node.children.items():
-            # traverse root first
-            traversal.append((node.id, child.id, distance))
-            # then traverse children recursively
-            preorder_traversal(child)
-    
-    preorder_traversal(root)
+# Calculates the Q matrix from the distance matrix and returns the two closest tips and their distance
+def construct_QMatrix(distMatrix):
+    N = len(distMatrix)
+    # Matrix to store the Q values
+    QMatrix = [[0] * N for _ in range(N)]
 
-    # writes the traversal list to file
-    with open('edges.txt', 'w') as f:
-        for (parent, child, distance) in traversal:
-            f.write(parent + '\t' + child + '\t' + str(distance) + '\n')
+    # We also want to return the two closest tips
+    mini = minj = 0
+    minVal = float('inf')
+
+    for i in range(N):
+        for j in range(N):
+            if i == j:
+                continue
+            QMatrix[i][j] = (N - 2) * distMatrix[i][j] - sum(distMatrix[i]) - sum(distMatrix[j])
+            # keep track of the minimum value and indices in the Q matrix
+            if QMatrix[i][j] < minVal:
+                mini = i
+                minj = j
+                minVal = QMatrix[i][j]
+    return mini, minj, minVal
 
 
 # uses post order traversal to write the newick file
-def write_newick_file(original_ids, root):
+def write_newick_file(seqIds, root):
     # recursive postorder traversal
     def postorder_traversal(node):
         if not node.children:
-            # if it a leaf node then return the original id
             if 1 <= int(node.id) <= 61:
-                return original_ids[int(node.id) - 1]
-        vals = []
+                return seqIds[int(node.id) - 1]
+        visited = []
         # recursively traverse the children first
         for child, distance in node.children.items():
-            vals.append(postorder_traversal(child) + ':' + str(distance))
-        result = '(' + ','.join(vals) + ')'
+            visited.append(postorder_traversal(child) + ':' + str(distance))
+        result = '(' + ','.join(visited) + ')'
         return result
-    # get the root nodes children.
-    # split it up into a 2 pair and 1 extra node for the root
-    (first, fd), (second, sd), (third, td) = root.children.items()
-    # recursively call the postorder traversal function to generate the newick format
-    first_part = '(' + postorder_traversal(second) + ':' + str(sd) + ','+ postorder_traversal(third) + ':' + str(td) + ')'
-    newick =  '(' + first_part + ':' + str(fd) + ');'
+ 
+    (first, f), (second, s), (third, t) = root.children.items()
+    first_part = '(' + postorder_traversal(second) + ':' + str(s) + ','+ postorder_traversal(third) + ':' + str(t) + ')'
+    newick =  '(' + first_part + ':' + str(f) + ');'
     with open('tree.txt', 'w') as f:
         f.write(newick)
 
 
-### BOOTSTRAPPING
+# Calculates the edge lengths to the u node and returns the lengths.
+def calculate_edge_lengths(distMatrix, mini, minj, N):
+    # Distances to the new internal node
+    edge_i = 1/ 2.0 * distMatrix[mini][minj] + 1 / (2.0  * (N - 2))* (sum(distMatrix[mini]) - sum(distMatrix[minj]))
+    # distance from minj node to u
+    edge_j = distMatrix[mini][minj] - edge_i
+    return edge_i, edge_j
+
+
+def calculate_new_distMatrix(distMatrix, mini, minj, N):
+    updatedDistances = [[0] * (N + 1) for _ in range(N + 1)]
+    for i in xrange(N):
+        for j in xrange(N):
+            updatedDistances[i][j] = distMatrix[i][j]
+    # update the distances to the new node
+    for k in range(N):
+        updatedDistances[N][k] = (0.5) * (distMatrix[mini][k] + distMatrix[minj][k] - distMatrix[mini][minj])
+        updatedDistances[k][N] = updatedDistances[N][k]
+
+    # Creates a new distance matrix 
+    new_distMatrix = [[0] * (N - 1) for _ in range(N - 1)]
+    keep_i = keep_j = 0
+    for i in range(N + 1):
+        # Replacing these two with a new node
+        if i == mini or i == minj:
+            continue
+        keep_j = 0
+        for j in range(N + 1):
+            # Replacing these two with the new node
+            if j == mini or j == minj:
+                continue
+            new_distMatrix[keep_i][keep_j] = updatedDistances[i][j]
+            keep_j += 1
+        keep_i += 1
+
+    return new_distMatrix
+
 
 # write the percentages in the bootstrap file
 def write_bootstrap(percentages):
-    with open('bootstrap.txt', 'w') as f:
+    with open('boot.txt', 'w') as f:
         for percent in percentages:
             f.write(str(percent) + '\n')
 
-# do the 100 bootstrap sampling
-def bootstrap(original_root, ids, id_sequences):
-    # original order of teh ids in the original tree (dfs)
-    original_order = get_id_order(original_root)
-    original_partitions = get_partitions(original_root)
-    partition_count = [0] * 59
-    for _ in xrange(100):
-        # new bootstrap sequence
-        bootstrap_sequences = {}
-        # the columns to swap
-        all_indices = [i for i in xrange(len(id_sequences['152801']))]
-        indices = [random.choice(all_indices) for _ in xrange(len(all_indices))]
-        for id in ids:
-            # choose randomly the to reconstruct the sequence
-            new_sequence = ''
-            for index in indices:
-                new_sequence += id_sequences[id][index]
-            bootstrap_sequences[id] = new_sequence
-        # do the nei_saitou and get a new tree
-        distance_matrix = get_difference_matrix(ids, bootstrap_sequences)
-        root = nei_saitou(ids, distance_matrix)
-        # get the dictionary of partitions and ids under those partitions
-        partitions = get_partitions(root)
+def preOrder(root, visited):
+    if visited is None:
+        visited = []
+    if root is None or root.children is None:
+        return 
+    for child, distance in root.children.items():
+        visited.append((root.id, child.id, distance))
+        preOrder(child, visited)
+    return visited
 
-        # compare partitions to see which trees make the same partition as the original
-        for index, id in enumerate(original_order):
-            if original_partitions[id] == partitions[id]:
-                partition_count[index] += 1
-    percentages = [count / 100.0 for count in partition_count]
-    return percentages
+
+# uses preorder traversal to traverse the tree and generate the edges file
+def write_edge_file(root):
+    visited = preOrder(root, None)
+    # Write to the edges file
+    with open('edges.txt', 'w') as f:
+        for (parent, child, distance) in visited:
+            f.write(parent + '\t' + child + '\t' + str(distance) + '\n')
+

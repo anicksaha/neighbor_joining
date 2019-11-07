@@ -1,19 +1,22 @@
-### Neighbor joining
+To run the code:
+python main.py scripts-data/hw3.fna
 
-Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_joining) for phylogeny construction.
+This generates the following files by default:
+1. genetic_distances.txt
+2. edges.txt
+3. tree.txt
+4. bootstrap.txt
+All the above files are in the folder answers.
 
-### Prereq:
+Running the bootstrap code take a little longer. To avoid that,everything that
+follow the comment #bootstrap calculations# in main.py can be commented out.
 
-- Python 2.7
-- R, Packages - “ape” and “RColorBrewer”
-- `install.packages(c('ape','RColorBrewer'))`
+For visualization:
 
-### How to Run?
+Rscript scripts-data/hw3-plot-newick.r tree.txt scripts-data/hw3-tip-labels.txt
+or
+Rscript scripts-data/hw3-plot-edges.r edges.txt scripts-data/hw3-tip-labels.txt
 
-- `python main.py <path to sequence file>`
-- `python main.py hw3.fna`
+For bonus visualization:
 
-### Visualize
-
-- `Rscript hw3-plot-newick.r tree.txt hw3-tip-labels.txt`
-- `Rscript hw3-plot-edges.r edges.txt hw3-tip-labels.txt`
+Rscript scripts-data/hw3-plot-edges.r edges.txt scripts-data/hw3-tip-labels.txt boot.txt

@@ -1,29 +1,37 @@
-import utils
-from neighbor_joining import nei_saitou
+from node import Node
 import sys
+from neighbour_joining import nei_saitou
+import utils
+from random import randint
+import bootstrap
 
 def main(filename):
-    # read the fna file and return the ids and id sequence mappings
-    ids, id_sequences = utils.read_fasta_file(filename)
+    # First step is to read the file and get the sequences
+    ids, sequences = utils.read_fasta_file(filename)
 
-    # generate the difference matrix
-    distance_matrix = utils.get_difference_matrix(ids, id_sequences)
+    # Then generate the distance matrix
+    distMatrix = utils.get_distMatrix(ids, sequences)
 
     # write the distances.txt file (distance matrix)
-    utils.write_distance_file(ids, distance_matrix)
+    utils.write_distMatrix(ids, distMatrix)
+    
+    #This is used to number the sequences/nodes in the tree to be constructed
+    seqCounter = 120
 
-    # run the nei saitu algorithm. Returns the root of the tree
-    root = nei_saitou(ids, distance_matrix)
+    root = nei_saitou(ids, distMatrix, seqCounter)
 
-    # write the edge file using preorder traversal
+    # Writing the edge file
     utils.write_edge_file(root)
 
-    # write the newick file using postorder traversal
+    # Writing the newick file
     utils.write_newick_file(ids, root)
 
-    # bootstrap bonus points
-    # percentages = utils.bootstrap(root, ids, id_sequences)
-    # utils.write_bootstrap(percentages)
+    #bootstrap calculations
+    #Bootstrap_instance = bootstrap.Bootstrap()
+    #percentages = Bootstrap_instance.bootstrap(root, ids, sequences)
+    #utils.write_bootstrap(percentages)
+
 
 if __name__ == '__main__':
     main(sys.argv[1])
+    

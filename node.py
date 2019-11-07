@@ -1,5 +1,6 @@
-# A Tree node has its own id and a map of child nodes and respective distances
-class TreeNode:
+# class to represent a node in a Tree
+# a node has its own id and a map of child nodes and respective distances
+class Node:
     def __init__(self, id):
         self.id = id
         self.children = None
