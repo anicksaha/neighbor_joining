@@ -10,7 +10,6 @@ Nei-Saitou [neighbor-joining algorithm](https://en.wikipedia.org/wiki/Neighbor_j
 
 ### How to Run?
 
-To run the code:
 - `python main.py hw3.fna`
 
 This generates the following files:
